@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -49,9 +49,22 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    
+    'raven.contrib.django.middleware.Sentry404CatchMiddleware',
+
 ]
 
 ROOT_URLCONF = 'myproject.urls'
+
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+}
 
 TEMPLATES = [
     {
@@ -68,6 +81,26 @@ TEMPLATES = [
         },
     },
 ]
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'level': 'ERROR',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': 'ERROR',
+            'propagate': True,
+        },
+    },
+}
+
 
 WSGI_APPLICATION = 'myproject.wsgi.application'
 
@@ -127,10 +160,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 import sentry_sdk
 from sentry_sdk.integrations.django import DjangoIntegration
 # Sentry Integration
-import os
+
 sentry_sdk.init(
     dsn=os.getenv('SENTRY_DSN'),  # Replace with your Sentry DSN
     integrations=[DjangoIntegration()],
-    traces_sample_rate=1.0,
-    send_default_pii=True,
+    traces_sample_rate=1.0,  # Adjust sampling rate as needed
+    send_default_pii=True,   # Send user data if necessary
 )

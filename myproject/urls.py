@@ -16,7 +16,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-
+from myapp.views import ProjectAPIView, TaskAPIView,trigger_error
+from myapp import views
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('projects/', ProjectAPIView.as_view(), name='project-list-create'),
+    path('projects/<int:pk>/', ProjectAPIView.as_view(), name='project-detail'),
+    path('tasks/', TaskAPIView.as_view(), name='task-list-create'),
+    path('tasks/<int:pk>/', TaskAPIView.as_view(), name='task-detail'),
+    path('sentry-debug/', views.trigger_error, name='sentry-debug'),
+    path('sentry-permission/', views.trigger_permission_denied, name='sentry-permission'),
+    path('sentry-value-error/', views.trigger_value_error, name='sentry-value-error'),
+    path('sentry-logging/', views.trigger_logging_error, name='sentry-logging'),
 ]
